@@ -1,0 +1,27 @@
+{
+  "name": "mcp1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kradriany/mcp1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kradriany/mcp1/issues"
+  },
+  "homepage": "https://github.com/kradriany/mcp1#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "openapi-backend": "^5.13.0",
+    "swagger-ui-express": "^5.0.1"
+  }
+}
