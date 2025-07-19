@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build: .
+    container_name: mcp-server
+    ports:
+      - "8080:8080"
+    environment:
+      - MCP_LOG_LEVEL=INFO
+      - MCP_LOG_FORMAT=json
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8080
+      - MCP_LOAD_CONTEXT_ON_STARTUP=true
+      # 🔧 CONFIG: Add your environment variables
+      # - MCP_API_KEY=your-secret-key
+      # - MCP_MQTT_DEFAULT_HOST=broker.mqtt.com
+      # - MCP_MQTT_DEFAULT_PORT=1883
+    volumes:
+      # Mount for persistent context cache
+      - mcp-context:/tmp/_mcp_context
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 🔧 ADD more services (MQTT broker, etc.)
+  # mqtt-broker:
+  #   image: eclipse-mosquitto:latest
+  #   container_name: mqtt-broker
+  #   ports:
+  #     - "1883:1883"
+  #     - "9001:9001"
+  #   volumes:
+  #     - mosquitto-data:/mosquitto/data
+  #     - mosquitto-logs:/mosquitto/log
+
+volumes:
+  mcp-context:
+  # mosquitto-data:
+  # mosquitto-logs:
