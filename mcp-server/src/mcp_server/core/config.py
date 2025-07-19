@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # Security
     api_key: Optional[str] = Field(None, description="Optional API key for authentication")
-    cors_origins: list[str] = Field(["*"], description="CORS allowed origins")
+    cors_origins: list[str] = Field(["http://localhost:3000"], description="CORS allowed origins")
     
     # Adapter defaults
     default_timeout: float = Field(30.0, description="Default connection timeout")

@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build: ./mcp-server
+    container_name: mcp-server
+    ports:
+      - "8080:8080"
+    environment:
+      - MCP_LOG_LEVEL=INFO
+      - MCP_LOG_FORMAT=json
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8080
+      - MCP_LOAD_CONTEXT_ON_STARTUP=true
+    volumes:
+      - mcp-context:/tmp/_mcp_context
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mcp-api:
+    build: ./mcp-api
+    container_name: mcp-api
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
+  mcp-frontend:
+    build: ./mcp-frontend
+    container_name: mcp-frontend
+    ports:
+      - "3100:3100"
+    depends_on:
+      - mcp-api
+      - opcua-bridge
+    restart: unless-stopped
+
+  opcua-bridge:
+    build: ./opcua-bridge
+    container_name: opcua-bridge
+    ports:
+      - "4001:4000"
+    depends_on:
+      - perlin
+    restart: unless-stopped
+
+  perlin:
+    build: ./perlin
+    container_name: perlin
+    ports:
+      - "4840:4840"
+    restart: unless-stopped
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566" # Edge port for all AWS services
+    environment:
+      - SERVICES=s3,dynamodb,lambda,apigateway
+      - DEBUG=1
+    volumes:
+      - ./localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  mcp-context: 

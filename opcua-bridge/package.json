@@ -1,0 +1,21 @@
+{
+  "name": "opcua-bridge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "node-opcua": "^2.156.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "node-fetch": "^2.6.7"
+  }
+}

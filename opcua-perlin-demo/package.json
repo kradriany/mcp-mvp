@@ -1,0 +1,18 @@
+{
+  "name": "opcua-perlin-demo",
+  "version": "1.0.0",
+  "description": "OPC UA Perlin Noise Server with React Frontend",
+  "scripts": {
+    "start-server": "node server/index.js",
+    "start-bridge": "node bridge/index.js",
+    "start-frontend": "cd frontend && npm start",
+    "dev": "concurrently \"npm run start-server\" \"npm run start-bridge\" \"npm run start-frontend\"",
+    "install-all": "npm install && cd frontend && npm install"
+  },
+  "dependencies": {
+    "node-opcua": "^2.115.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "concurrently": "^8.2.2"
+  }
+}

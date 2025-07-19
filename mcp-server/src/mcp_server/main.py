@@ -22,6 +22,10 @@ from .schemas import (
     ErrorResponse
 )
 
+from asyncua import Client as OPCUAClient
+import boto3
+import os
+
 # Configure logging
 if settings.log_format == "json":
     logging.basicConfig(
@@ -234,6 +238,55 @@ async def search_context(q: str, limit: int = 5):
         "query": q,
         "results": results
     }
+
+# OPC UA config
+OPCUA_URL = os.getenv("OPCUA_URL", "opc.tcp://perlin:4840")
+NODE_ID = os.getenv("OPCUA_NODE_ID", "ns=1;s=PerlinNoise")
+latest_value = None
+
+async def poll_opcua():
+    global latest_value
+    while True:
+        try:
+            async with OPCUAClient(url=OPCUA_URL) as client:
+                node = client.get_node(NODE_ID)
+                while True:
+                    value = await node.read_value()
+                    latest_value = value
+                    await asyncio.sleep(1)
+        except Exception as e:
+            print("OPC UA poll error:", e)
+            latest_value = None
+            await asyncio.sleep(5)
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(poll_opcua())
+
+@app.get("/opcua/latest")
+async def get_opcua_latest():
+    if latest_value is not None:
+        return {"value": latest_value}
+    return {"error": "No value yet"}, 503
+
+# AWS/LocalStack S3 config
+AWS_ENDPOINT_URL = os.getenv("AWS_ENDPOINT_URL", "http://localstack:4566")
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
+s3 = boto3.client(
+    "s3",
+    endpoint_url=AWS_ENDPOINT_URL,
+    region_name=AWS_REGION,
+    aws_access_key_id="test",
+    aws_secret_access_key="test"
+)
+
+@app.get("/s3-test")
+def s3_test():
+    bucket = "test-bucket"
+    s3.create_bucket(Bucket=bucket)
+    s3.put_object(Bucket=bucket, Key="hello.txt", Body="Hello from FastAPI!")
+    obj = s3.get_object(Bucket=bucket, Key="hello.txt")
+    return {"content": obj["Body"].read().decode()}
 
 
 if __name__ == "__main__":
